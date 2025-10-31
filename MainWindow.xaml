@@ -23,12 +23,11 @@
                     ER:LC AutoRob Tool
                 </TextBlock>
                 <TextBlock FontSize="12" TextAlignment="Center" Foreground="#FF757575" Margin="0,5,0,0">
-    Version: 2.1.1 | Last Update: 31/10/2025<LineBreak/>
-    By Slender111223<LineBreak/>
+    Version: 1.1.1 | Last Update: 31/10/2025<LineBreak/>
                     Optimized By <Hyperlink NavigateUri="https://suicides.live/ex" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#FF009688">
  vornex.
 </Hyperlink> <LineBreak/>
-    <Hyperlink NavigateUri="https://github.com/slender1112232/ERLC-Auto-Rob-Tool-UI" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#FF009688">
+    <Hyperlink NavigateUri="https://github.com/vornexxxx/AutoRob-Tool/releases" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#FF009688">
      GitHub Repository
     </Hyperlink>
 

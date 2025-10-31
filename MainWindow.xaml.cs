@@ -253,9 +253,9 @@ namespace ELRCRobTool
             catch (Exception ex) { AppendLog($"Error playing sound: {ex.Message}"); }
         }
         /* ─────────────────────────── Update Checker ─────────────────────────── */
-        private const string CurrentVersion = "2.1.1"; // Current version from the UI
-        private const string GitHubApiUrl = "https://api.github.com/repos/slender1112232/ERLC-Auto-Rob-Tool-UI/releases/latest";
-        private const string GitHubReleaseUrl = "https://github.com/slender1112232/ERLC-Auto-Rob-Tool-UI/releases/latest";
+        private const string CurrentVersion = "1.1.1"; // Current version from the UI
+        private const string GitHubApiUrl = "https://api.github.com/vornexxxx/AutoRob-Tool/releases/latest";
+        private const string GitHubReleaseUrl = "https://github.com/vornexxxx/AutoRob-Tool/releases/latest";
 
         private async void CheckForUpdates()
         {
