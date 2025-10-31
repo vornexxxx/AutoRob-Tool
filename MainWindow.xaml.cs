@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Media;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -238,7 +239,7 @@ namespace ELRCRobTool
         /* ─────────────────────────── Sound ─────────────────────────── */
         private void PlaySound(string action)
         {
-            string path = action switch
+            string fileName = action switch
             {
                 "RobBank" => "Banks.wav",
                 "AutoATM" => "ATM.wav",
@@ -246,11 +247,26 @@ namespace ELRCRobTool
                 "LockPick" => "LockPick.wav",
                 _ => "Default.wav"
             };
-            if (string.IsNullOrEmpty(path)) return;
-            path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "audio", path);
-            if (!File.Exists(path)) return;
-            try { using var p = new SoundPlayer(path); p.Play(); }
-            catch (Exception ex) { AppendLog($"Error playing sound: {ex.Message}"); }
+
+            try
+            {
+                // "ELRCRobTool.audio.Banks.wav" format: <DefaultNamespace>.<folder>.<filename>
+                string resourcePath = $"ELRCRobTool.audio.{fileName}";
+                using Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath);
+                if (stream != null)
+                {
+                    using var player = new SoundPlayer(stream);
+                    player.Play();
+                }
+                else
+                {
+                    AppendLog($"Sound not found: {fileName}");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppendLog($"Error playing sound: {ex.Message}");
+            }
         }
         /* ─────────────────────────── Update Checker ─────────────────────────── */
         private const string CurrentVersion = "1.1.1"; // Current version from the UI
