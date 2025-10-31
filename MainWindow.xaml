@@ -94,6 +94,12 @@
                     <TextBlock Text="[Esc] Exit"/>
                 </StackPanel>
             </Button>
+            <Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" Style="{StaticResource MaterialDesignRaisedButton}" Background="#FF673AB7" BorderBrush="#FF673AB7" Foreground="White" Click="Options_Click">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="Settings" Margin="0,0,5,0" Foreground="White"/>
+                    <TextBlock Text="Options"/>
+                </StackPanel>
+            </Button>
             <!-- Nút Reset Cooldown -->
             <Button Grid.Row="3" Grid.Column="1" Margin="5" Style="{StaticResource MaterialDesignRaisedButton}" Background="#FF2196F3" BorderBrush="#FF2196F3" Foreground="White" Click="ResetCooldown_Click">
                 <StackPanel Orientation="Horizontal">

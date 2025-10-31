@@ -1,22 +1,36 @@
-﻿using System;
+﻿using ELRCRobTool.Robberies;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Media;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Navigation;
-using ELRCRobTool.Robberies;
-using System.Windows.Threading;
-using System.Media;
-using System.IO;
-using System.Windows.Media;
 using System.Windows.Controls;
-using System.Collections.Generic;
-using System.Net.Http;
-using Newtonsoft.Json.Linq;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Navigation;
+using System.Windows.Threading;
 
 namespace ELRCRobTool
 {
     public partial class MainWindow : Window
     {
+        private KeyboardHook? _keyboardHook;
+
+        private bool _globalHotkeys = false;
+
+        private void Options_Click(object sender, RoutedEventArgs e)
+        {
+            var options = new OptionsWindow(_globalHotkeys);
+            if (options.ShowDialog() == true)
+            {
+                _globalHotkeys = options.GlobalHotkeysEnabled;
+                AppendLog($"Global Hotkeys: {(_globalHotkeys ? "Enabled" : "Disabled")}");
+            }
+        }
         private class CooldownInfo
         {
             public DispatcherTimer Timer { get; set; } = null!;
@@ -41,7 +55,32 @@ namespace ELRCRobTool
                 LogTextBox.AppendText(m + "\n");
                 LogTextBox.ScrollToEnd();
             });
+
+            _keyboardHook = new KeyboardHook();
+            _keyboardHook.OnKeyEvent += KeyboardHook_OnKeyEvent;
         }
+
+        private readonly HashSet<Key> _pressedKeys = new();
+
+        private void KeyboardHook_OnKeyEvent(Key key, bool isDown)
+        {
+            if (!_globalHotkeys) return;
+
+            // Track currently pressed keys
+            if (isDown) _pressedKeys.Add(key);
+            else _pressedKeys.Remove(key);
+
+            // Check CTRL + number
+            if (_pressedKeys.Contains(Key.LeftCtrl) || _pressedKeys.Contains(Key.RightCtrl))
+            {
+                if (_pressedKeys.Contains(Key.D1)) Dispatcher.Invoke(() => LockPick_Click(null!, null!));
+                if (_pressedKeys.Contains(Key.D2)) Dispatcher.Invoke(() => GlassCutting_Click(null!, null!));
+                if (_pressedKeys.Contains(Key.D3)) Dispatcher.Invoke(() => AutoATM_Click(null!, null!));
+                if (_pressedKeys.Contains(Key.D4)) Dispatcher.Invoke(() => Crowbar_Click(null!, null!));
+                if (_pressedKeys.Contains(Key.D5)) Dispatcher.Invoke(() => RobBank_Click(null!, null!));
+            }
+        }
+
 
         /* ─────────────────────────── Utility ─────────────────────────── */
         public string SystemScaleMultiplier => Screen.SystemScaleMultiplier.ToString("F2");
@@ -275,6 +314,24 @@ namespace ELRCRobTool
                     Process.Start(new ProcessStartInfo(GitHubReleaseUrl) { UseShellExecute = true });
                 }
                 // When "No" or "X" is clicked, do nothing, so it checks again next time
+            });
+        }
+        private void SetupGlobalHotkeys()
+        {
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    if (_globalHotkeys && Keyboard.IsKeyDown(Key.LeftCtrl))
+                    {
+                        if (Keyboard.IsKeyDown(Key.D1)) Dispatcher.Invoke(() => LockPick_Click(null!, null!));
+                        if (Keyboard.IsKeyDown(Key.D2)) Dispatcher.Invoke(() => GlassCutting_Click(null!, null!));
+                        if (Keyboard.IsKeyDown(Key.D3)) Dispatcher.Invoke(() => AutoATM_Click(null!, null!));
+                        if (Keyboard.IsKeyDown(Key.D4)) Dispatcher.Invoke(() => Crowbar_Click(null!, null!));
+                        if (Keyboard.IsKeyDown(Key.D5)) Dispatcher.Invoke(() => RobBank_Click(null!, null!));
+                    }
+                    Thread.Sleep(50); // Small delay to reduce CPU usage
+                }
             });
         }
     }
