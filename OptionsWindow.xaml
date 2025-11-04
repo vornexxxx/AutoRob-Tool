@@ -18,12 +18,15 @@
         <TextBlock Grid.Row="0" Text="Options" FontSize="20" FontWeight="Bold" TextAlignment="Center" Foreground="#FF212121" Margin="0,0,0,15"/>
 
         <StackPanel Grid.Row="1" VerticalAlignment="Top" Margin="10,0">
-            <!-- Global Hotkeys (Always Visible) -->
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5">
-                <TextBlock Text="Global Hotkeys: " VerticalAlignment="Center" FontSize="14" Foreground="#FF212121"/>
-                <TextBlock x:Name="GlobalHotkeysStatus" FontSize="16" FontWeight="Bold" Margin="5,0"/>
-                <Button Content="Toggle" Click="ToggleGlobalHotkeys_Click" Margin="10,0,0,0" Padding="5,2" Background="#FF009688" Foreground="White" BorderBrush="#FF00796B"/>
-            </StackPanel>
+            <!-- Global Hotkeys (Now a Toggle Switch) -->
+            <Grid VerticalAlignment="Center" Margin="0,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Global Hotkeys" VerticalAlignment="Center" FontSize="14" Foreground="#FF212121" Grid.Column="0"/>
+                <ToggleButton x:Name="GlobalHotkeysToggle" Click="ToggleGlobalHotkeys_Click" Style="{StaticResource MaterialDesignSwitchToggleButton}" Grid.Column="1"/>
+            </Grid>
 
             <Separator Margin="0,15"/>
 
@@ -35,7 +38,6 @@
                 • <Run FontWeight="SemiBold">CTRL + 3:</Run> Auto ATM Robbery<LineBreak/>
                 • <Run FontWeight="SemiBold">CTRL + 4:</Run> Auto Crowbar
             </TextBlock>
-
             <Separator Margin="0,15"/>
 
             <!-- Collapsible Debug & Performance Options -->
@@ -44,35 +46,38 @@
                       BorderBrush="#FFCCCCCC"
                       BorderThickness="1">
                 <StackPanel Margin="15">
-                    <!-- Debug Mode -->
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5">
-                        <TextBlock Text="Enable Debug Mode: " VerticalAlignment="Center" FontSize="14" Foreground="#FF212121"/>
-                        <TextBlock x:Name="DebugModeStatus" FontSize="16" FontWeight="Bold" Margin="5,0"/>
-                        <Button Content="Toggle" Click="ToggleDebugMode_Click" Margin="10,0,0,0" Padding="5,2" Background="#FF009688" Foreground="White" BorderBrush="#FF00796B"/>
-                    </StackPanel>
+                    <!-- Debug Mode (Now a Toggle Switch) -->
+                    <Grid VerticalAlignment="Center" Margin="0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Enable Debug Mode" VerticalAlignment="Center" FontSize="14" Foreground="#FF212121" Grid.Column="0"/>
+                        <ToggleButton x:Name="DebugModeToggle" Click="ToggleDebugMode_Click" Style="{StaticResource MaterialDesignSwitchToggleButton}" Grid.Column="1"/>
+                    </Grid>
                     <TextBlock Text="Logs detailed info to ERLC_Debug_Log.txt." FontSize="11" Foreground="Gray" Margin="0,2,0,10"/>
-
                     <Separator Margin="0,15"/>
 
-                    <!-- Lockpick Scan Delay -->
-                    <StackPanel Margin="0,5">
-                        <TextBlock Text="Lockpick Scan Delay (ms):" VerticalAlignment="Center" FontSize="14" Foreground="#FF212121"/>
-                        <TextBox x:Name="LockpickDelayTextBox" materialDesign:HintAssist.Hint="Default: 1" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,5,0,0" TextChanged="LockpickDelay_TextChanged" PreviewTextInput="NumberValidationTextBox"/>
-                        <TextBlock Text="Lower is faster (e.g., 0 or 1). Higher is slower." FontSize="11" Foreground="Gray" TextAlignment="Center" Margin="0,2,0,0" TextWrapping="Wrap"/>
-                    </StackPanel>
-
+                    <!-- Wide Scan Area (Already a Toggle Switch) -->
+                    <Grid VerticalAlignment="Center" Margin="0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Use Wide Scan Area:" VerticalAlignment="Center" FontSize="14" Foreground="#FF212121" Grid.Column="0"/>
+                        <ToggleButton x:Name="WideScanToggle" Click="ToggleWideScan_Click" Style="{StaticResource MaterialDesignSwitchToggleButton}" Grid.Column="1"/>
+                    </Grid>
+                    <TextBlock Text="ON is more reliable against lag. OFF is more precise." FontSize="11" Foreground="Gray" Margin="0,2,0,10"/>
                     <Separator Margin="0,15"/>
 
-                    <!-- ATM Scan Delay -->
-                    <StackPanel Margin="0,5">
-                        <TextBlock Text="ATM Scan Delay (ms):" VerticalAlignment="Center" FontSize="14" Foreground="#FF212121"/>
-                        <TextBox x:Name="AtmDelayTextBox" materialDesign:HintAssist.Hint="Default: 20" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,5,0,0" TextChanged="AtmDelay_TextChanged" PreviewTextInput="NumberValidationTextBox"/>
-                        <TextBlock Text="Lower is faster. Controls pause between pixel checks." FontSize="11" Foreground="Gray" TextAlignment="Center" Margin="0,2,0,0" TextWrapping="Wrap"/>
-                    </StackPanel>
+                    <!-- Performance TextBoxes -->
+                    <TextBox x:Name="LockpickDelayTextBox" materialDesign:HintAssist.Hint="Lockpick Scan Delay (ms)" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,5,0,0" TextChanged="LockpickDelay_TextChanged" PreviewTextInput="NumberValidationTextBox"/>
+                    <TextBox x:Name="LockpickReactionTextBox" materialDesign:HintAssist.Hint="Lockpick Reaction Time (ms)" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,15,0,0" TextChanged="LockpickReaction_TextChanged" PreviewTextInput="NumberValidationTextBox"/>
+                    <TextBox x:Name="AtmDelayTextBox" materialDesign:HintAssist.Hint="ATM Scan Delay (ms)" Style="{StaticResource MaterialDesignFloatingHintTextBox}" Margin="0,15,0,0" TextChanged="AtmDelay_TextChanged" PreviewTextInput="NumberValidationTextBox"/>
                 </StackPanel>
             </Expander>
         </StackPanel>
 
-        <Button Grid.Row="2" Style="{StaticResource MaterialDesignRaisedButton}" Content="Close" Height="35" Margin="0,15,0,0" Click="Close_Click" Background="#FF009688" Foreground="White"/>
+        <Button Grid.Row="2" Style="{StaticResource MaterialDesignRaisedButton}" Content="Close" Height="35" Margin="0,15,0,0" Click="Close_Click"/>
     </Grid>
 </Window>
