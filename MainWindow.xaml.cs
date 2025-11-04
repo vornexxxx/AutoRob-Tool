@@ -250,7 +250,7 @@ namespace ELRCRobTool
             PlaySpecificSound(fileName);
         }
 
-        private const string CurrentVersion = "1.2.0";
+        private const string CurrentVersion = "1.2.1";
         private const string GitHubApiUrl = "https://api.github.com/repos/vornexxxx/AutoRob-Tool/releases/latest";
         private const string GitHubReleaseUrl = "https://github.com/vornexxxx/AutoRob-Tool/releases/latest";
 
