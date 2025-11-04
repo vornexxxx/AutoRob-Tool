@@ -21,16 +21,12 @@ namespace ELRCRobTool
     {
         private KeyboardHook? _keyboardHook;
 
-        private bool _globalHotkeys = false;
-
         private void Options_Click(object sender, RoutedEventArgs e)
         {
-            var options = new OptionsWindow(_globalHotkeys);
-            if (options.ShowDialog() == true)
-            {
-                _globalHotkeys = options.GlobalHotkeysEnabled;
-                AppendLog($"Global Hotkeys: {(_globalHotkeys ? "Enabled" : "Disabled")}");
-            }
+            var options = new OptionsWindow();
+            options.ShowDialog();
+            AppendLog($"Global Hotkeys: {(AppSettings.Config.GlobalHotkeysEnabled ? "Enabled" : "Disabled")}");
+            AppendLog($"Debug Mode: {(AppSettings.Config.DebugModeEnabled ? "Enabled" : "Disabled")}");
         }
         private class CooldownInfo
         {
@@ -46,6 +42,10 @@ namespace ELRCRobTool
         {
             InitializeComponent();
             DataContext = this;
+
+            AppSettings.Load();
+            Logger.DebugWriteLine("Application starting. Settings loaded.");
+
             CheckRoblox();
             SetupCooldowns();
             CheckForUpdates();
@@ -65,26 +65,20 @@ namespace ELRCRobTool
 
         private void KeyboardHook_OnKeyEvent(Key key, bool isDown)
         {
-            if (!_globalHotkeys) return;
+            if (!AppSettings.Config.GlobalHotkeysEnabled) return;
 
-            // Track currently pressed keys
             if (isDown) _pressedKeys.Add(key);
             else _pressedKeys.Remove(key);
 
-            // Check CTRL + number
             if (_pressedKeys.Contains(Key.LeftCtrl) || _pressedKeys.Contains(Key.RightCtrl))
             {
                 if (_pressedKeys.Contains(Key.D1)) Dispatcher.Invoke(() => LockPick_Click(null!, null!));
                 if (_pressedKeys.Contains(Key.D2)) Dispatcher.Invoke(() => GlassCutting_Click(null!, null!));
                 if (_pressedKeys.Contains(Key.D3)) Dispatcher.Invoke(() => AutoATM_Click(null!, null!));
                 if (_pressedKeys.Contains(Key.D4)) Dispatcher.Invoke(() => Crowbar_Click(null!, null!));
-                if (_pressedKeys.Contains(Key.D5)) Dispatcher.Invoke(() => RobBank_Click(null!, null!));
+                // CTRL + 5 hotkey for bank robbery has been removed
             }
         }
-
-
-        /* ─────────────────────────── Utility ─────────────────────────── */
-        public string SystemScaleMultiplier => Screen.SystemScaleMultiplier.ToString("F2");
 
         private void AppendLog(string msg) => Logger.WriteLine(msg);
 
@@ -99,13 +93,12 @@ namespace ELRCRobTool
             });
         }
 
-        /* ─────────────────────────── Cooldowns ─────────────────────────── */
         private void SetupCooldowns()
         {
             _cooldowns["AutoATM"] = new() { Display = AutoATMCooldown };
-            _cooldowns["RobBank"] = new() { Display = RobBankCooldown };
             _cooldowns["GlassCutting"] = new() { Display = GlassCuttingCooldown };
             _cooldowns["LockPick"] = new() { Display = LockPickCooldown };
+            // The cooldown for "RobBank" has been removed
 
             foreach (var cd in _cooldowns.Values)
             {
@@ -156,19 +149,18 @@ namespace ELRCRobTool
             cd.Timer.Start();
         }
 
-        /* ─────────────────────────── StartAction core ─────────────────────────── */
         private void StartAction(Action action, string name, int cdSeconds = 0, TextBlock? cdDisplay = null)
         {
-            // ➜ Do not block while cooldown is running, but reset the countdown after the action finishes.
+            PlaySpecificSound("START.wav");
+
             if (cdDisplay != null && _cooldowns.TryGetValue(name, out var cdRunning) && cdRunning.Timer.IsEnabled)
             {
-                cdRunning.Timer.Stop(); // stop the current cooldown
+                cdRunning.Timer.Stop();
                 cdRunning.RemainingSeconds = 0;
                 cdDisplay.Text = "Running...";
                 cdDisplay.Background = Brushes.Orange;
                 cdDisplay.Foreground = Brushes.Black;
             }
-
 
             if (name != "GlassCutting") Program.SetStopAction(false);
 
@@ -184,10 +176,7 @@ namespace ELRCRobTool
                     action();
                     Dispatcher.Invoke(() => AppendLog($"{name} completed."));
                 }
-                catch (Exception ex)
-                {
-                    Dispatcher.Invoke(() => AppendLog($"Error: {ex.Message}"));
-                }
+                catch (Exception ex) { Dispatcher.Invoke(() => AppendLog($"Error: {ex.Message}")); }
                 finally
                 {
                     Program.SetStopAction(false);
@@ -197,19 +186,16 @@ namespace ELRCRobTool
             });
         }
 
-        /* ─────────────────────────── Button handlers ─────────────────────────── */
         private void LockPick_Click(object s, RoutedEventArgs e) => StartAction(() => LockPicking.StartProcess(), "LockPick", 285, LockPickCooldown);
         private void GlassCutting_Click(object s, RoutedEventArgs e) => StartAction(() => GlassCutting.StartProcess(), "GlassCutting", 15, GlassCuttingCooldown);
         private void AutoATM_Click(object s, RoutedEventArgs e) => StartAction(() => ATM.StartProcess(), "AutoATM", 360, AutoATMCooldown);
         private void Crowbar_Click(object s, RoutedEventArgs e) => StartAction(() => Crowbar.StartProcess(), "Crowbar");
-        private void RobBank_Click(object s, RoutedEventArgs e) => StartAction(() => AppendLog("Robbing Bank (simulated)..."), "RobBank", 360, RobBankCooldown);
+        // The RobBank_Click method has been removed
 
-        /* ─────────────────────────── Misc handlers ─────────────────────────── */
         private void Stop_Click(object s, RoutedEventArgs e) { Program.SetStopAction(true); AppendLog("Stopping current action..."); }
         private void Exit_Click(object s, RoutedEventArgs e) => Application.Current.Shutdown();
 
-        private void Hyperlink_RequestNavigate(object s, RequestNavigateEventArgs e)
-        { Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true }); e.Handled = true; }
+        private void Hyperlink_RequestNavigate(object s, RequestNavigateEventArgs e) { Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true }); e.Handled = true; }
 
         private void ResetCooldown_Click(object s, RoutedEventArgs e)
         {
@@ -222,35 +208,24 @@ namespace ELRCRobTool
             AppendLog("All cooldowns reset.");
         }
 
-        /* ─────────────────────────── Key bindings ─────────────────────────── */
-        private void MainWindow_KeyDown(object s, System.Windows.Input.KeyEventArgs e)
+        private void MainWindow_KeyDown(object s, KeyEventArgs e)
         {
+            if (AppSettings.Config.GlobalHotkeysEnabled) return;
             switch (e.Key)
             {
-                case System.Windows.Input.Key.D1: LockPick_Click(s, new()); break;
-                case System.Windows.Input.Key.D2: GlassCutting_Click(s, new()); break;
-                case System.Windows.Input.Key.D3: AutoATM_Click(s, new()); break;
-                case System.Windows.Input.Key.D4: Crowbar_Click(s, new()); break;
-                case System.Windows.Input.Key.D5: RobBank_Click(s, new()); break;
-                case System.Windows.Input.Key.Escape: Exit_Click(s, new()); break;
+                case Key.D1: LockPick_Click(s, new()); break;
+                case Key.D2: GlassCutting_Click(s, new()); break;
+                case Key.D3: AutoATM_Click(s, new()); break;
+                case Key.D4: Crowbar_Click(s, new()); break;
+                // Key.D5 for bank robbery has been removed
+                case Key.Escape: Exit_Click(s, new()); break;
             }
         }
 
-        /* ─────────────────────────── Sound ─────────────────────────── */
-        private void PlaySound(string action)
+        private void PlaySpecificSound(string fileName)
         {
-            string fileName = action switch
-            {
-                "RobBank" => "Banks.wav",
-                "AutoATM" => "ATM.wav",
-                "GlassCutting" => "GlassCutting.wav",
-                "LockPick" => "LockPick.wav",
-                _ => "Default.wav"
-            };
-
             try
             {
-                // "ELRCRobTool.audio.Banks.wav" format: <DefaultNamespace>.<folder>.<filename>
                 string resourcePath = $"ELRCRobTool.audio.{fileName}";
                 using Stream? stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath);
                 if (stream != null)
@@ -258,97 +233,30 @@ namespace ELRCRobTool
                     using var player = new SoundPlayer(stream);
                     player.Play();
                 }
-                else
-                {
-                    AppendLog($"Sound not found: {fileName}");
-                }
+                else { AppendLog($"Sound not found: {fileName}"); }
             }
-            catch (Exception ex)
-            {
-                AppendLog($"Error playing sound: {ex.Message}");
-            }
+            catch (Exception ex) { AppendLog($"Error playing sound: {ex.Message}"); }
         }
-        /* ─────────────────────────── Update Checker ─────────────────────────── */
-        private const string CurrentVersion = "1.1.1"; // Current version from the UI
-        private const string GitHubApiUrl = "https://api.github.com/vornexxxx/AutoRob-Tool/releases/latest";
+
+        private void PlaySound(string action)
+        {
+            string fileName = action switch
+            {
+                "AutoATM" => "ATM.wav",
+                "GlassCutting" => "GLASSCUTTING.wav",
+                "LockPick" => "LOCKPICK.wav",
+                _ => "Default.wav" // Default sound if no match
+            };
+            PlaySpecificSound(fileName);
+        }
+
+        private const string CurrentVersion = "1.1.1";
+        private const string GitHubApiUrl = "https://api.github.com/repos/vornexxxx/AutoRob-Tool/releases/latest";
         private const string GitHubReleaseUrl = "https://github.com/vornexxxx/AutoRob-Tool/releases/latest";
 
-        private async void CheckForUpdates()
-        {
-            try
-            {
-                string latestVersion = await GetLatestVersion();
-                if (IsNewerVersion(latestVersion, CurrentVersion))
-                {
-                    ShowUpdateDialog(latestVersion);
-                }
-                // Don't show if CurrentVersion is the latest or newer
-            }
-            catch (Exception ex)
-            {
-                AppendLog($"Error checking for updates: {ex.Message}");
-            }
-        }
-
-        private async Task<string> GetLatestVersion()
-        {
-            using (var client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Add("User-Agent", "ELRCRobTool"); // User-Agent is required for GitHub API
-                string json = await client.GetStringAsync(GitHubApiUrl);
-                JObject release = JObject.Parse(json);
-                return release["tag_name"]?.ToString().TrimStart('v') ?? CurrentVersion;
-            }
-        }
-
-        private bool IsNewerVersion(string latestVersion, string currentVersion)
-        {
-            try
-            {
-                Version latest = new Version(latestVersion);
-                Version current = new Version(currentVersion);
-                return latest > current;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        private void ShowUpdateDialog(string latestVersion)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                MessageBoxResult result = MessageBox.Show(
-                    $"A new version ({latestVersion}) is available! Would you like to download it?",
-                    "ELRCRobTool Update",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Information);
-
-                if (result == MessageBoxResult.Yes)
-                {
-                    Process.Start(new ProcessStartInfo(GitHubReleaseUrl) { UseShellExecute = true });
-                }
-                // When "No" or "X" is clicked, do nothing, so it checks again next time
-            });
-        }
-        private void SetupGlobalHotkeys()
-        {
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    if (_globalHotkeys && Keyboard.IsKeyDown(Key.LeftCtrl))
-                    {
-                        if (Keyboard.IsKeyDown(Key.D1)) Dispatcher.Invoke(() => LockPick_Click(null!, null!));
-                        if (Keyboard.IsKeyDown(Key.D2)) Dispatcher.Invoke(() => GlassCutting_Click(null!, null!));
-                        if (Keyboard.IsKeyDown(Key.D3)) Dispatcher.Invoke(() => AutoATM_Click(null!, null!));
-                        if (Keyboard.IsKeyDown(Key.D4)) Dispatcher.Invoke(() => Crowbar_Click(null!, null!));
-                        if (Keyboard.IsKeyDown(Key.D5)) Dispatcher.Invoke(() => RobBank_Click(null!, null!));
-                    }
-                    Thread.Sleep(50); // Small delay to reduce CPU usage
-                }
-            });
-        }
+        private async void CheckForUpdates() { try { string latestVersion = await GetLatestVersion(); if (IsNewerVersion(latestVersion, CurrentVersion)) { ShowUpdateDialog(latestVersion); } } catch (Exception ex) { AppendLog($"Error checking for updates: {ex.Message}"); } }
+        private async Task<string> GetLatestVersion() { using (var client = new HttpClient()) { client.DefaultRequestHeaders.Add("User-Agent", "ELRCRobTool"); string json = await client.GetStringAsync(GitHubApiUrl); JObject? release = JObject.Parse(json); string? tagName = release?["tag_name"]?.ToString(); return tagName?.TrimStart('v') ?? CurrentVersion; } }
+        private bool IsNewerVersion(string latestVersion, string currentVersion) { try { return new Version(latestVersion) > new Version(currentVersion); } catch { return false; } }
+        private void ShowUpdateDialog(string latestVersion) { Dispatcher.Invoke(() => { MessageBoxResult result = MessageBox.Show($"A new version ({latestVersion}) is available! Would you like to download it?", "ELRCRobTool Update", MessageBoxButton.YesNo, MessageBoxImage.Information); if (result == MessageBoxResult.Yes) { Process.Start(new ProcessStartInfo(GitHubReleaseUrl) { UseShellExecute = true }); } }); }
     }
 }

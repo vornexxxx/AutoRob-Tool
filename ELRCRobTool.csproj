@@ -12,30 +12,19 @@
     </PropertyGroup>
     <ItemGroup>
       <None Remove="audio\ATM.wav" />
-      <None Remove="audio\Banks.wav" />
       <None Remove="audio\Default.wav" />
-      <None Remove="audio\GlassCutting.wav" />
-      <None Remove="audio\LockPick.wav" />
+      <None Remove="audio\GLASSCUTTING.wav" />
+      <None Remove="audio\LOCKPICK.wav" />
+      <None Remove="audio\START.wav" />
     </ItemGroup>
     <ItemGroup>
       <Content Include="ERLClogo.ico" />
     </ItemGroup>
     <ItemGroup>
-      <EmbeddedResource Include="audio\ATM.wav">
-        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="audio\Banks.wav">
-        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="audio\Default.wav">
-        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="audio\GlassCutting.wav">
-        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-      </EmbeddedResource>
-      <EmbeddedResource Include="audio\LockPick.wav">
-        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-      </EmbeddedResource>
+      <EmbeddedResource Include="audio\ATM.wav" />
+      <EmbeddedResource Include="audio\GLASSCUTTING.wav" />
+      <EmbeddedResource Include="audio\LOCKPICK.wav" />
+      <EmbeddedResource Include="audio\START.wav" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="MaterialDesignThemes" Version="5.2.1" />

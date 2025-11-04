@@ -23,14 +23,13 @@
                     ER:LC AutoRob Tool
                 </TextBlock>
                 <TextBlock FontSize="12" TextAlignment="Center" Foreground="#FF757575" Margin="0,5,0,0">
-    Version: 1.1.1 | Last Update: 31/10/2025<LineBreak/>
+                    Version: 1.2.0 | Last Update: 04/11/2025<LineBreak/>
                     Optimized By <Hyperlink NavigateUri="https://suicides.live/ex" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#FF009688">
  vornex.
 </Hyperlink> <LineBreak/>
     <Hyperlink NavigateUri="https://github.com/vornexxxx/AutoRob-Tool/releases" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#FF009688">
      GitHub Repository
     </Hyperlink>
-
                 </TextBlock>
             </StackPanel>
         </materialDesign:Card>
@@ -47,8 +46,6 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <!-- Thêm row cho nút Reset Cooldown -->
             </Grid.RowDefinitions>
             <!-- Buttons -->
             <Button Grid.Row="0" Grid.Column="0" Margin="5" Style="{StaticResource MaterialDesignRaisedButton}" Background="#FF009688" BorderBrush="#FF009688" Foreground="White" Click="LockPick_Click">
@@ -75,10 +72,11 @@
                     <TextBlock Text="[4] Car Crowbar"/>
                 </StackPanel>
             </Button>
-            <Button Grid.Row="2" Grid.Column="0" Margin="5" Style="{StaticResource MaterialDesignRaisedButton}" Background="#FF009688" BorderBrush="#FF009688" Foreground="White" Click="RobBank_Click">
+            <!-- The Rob Bank button is now the Options button -->
+            <Button Grid.Row="2" Grid.Column="0" Margin="5" Style="{StaticResource MaterialDesignRaisedButton}" Background="#FF673AB7" BorderBrush="#FF673AB7" Foreground="White" Click="Options_Click">
                 <StackPanel Orientation="Horizontal">
-                    <materialDesign:PackIcon Kind="Bank" Margin="0,0,5,0" Foreground="White"/>
-                    <TextBlock Text="[5] Rob Bank"/>
+                    <materialDesign:PackIcon Kind="Settings" Margin="0,0,5,0" Foreground="White"/>
+                    <TextBlock Text="Options"/>
                 </StackPanel>
             </Button>
             <Button Grid.Row="2" Grid.Column="1" Margin="5" Style="{StaticResource MaterialDesignRaisedButton}" Background="#FFE57373" BorderBrush="#FFE57373" Foreground="White" Click="Stop_Click">
@@ -93,13 +91,6 @@
                     <TextBlock Text="[Esc] Exit"/>
                 </StackPanel>
             </Button>
-            <Button Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" Style="{StaticResource MaterialDesignRaisedButton}" Background="#FF673AB7" BorderBrush="#FF673AB7" Foreground="White" Click="Options_Click">
-                <StackPanel Orientation="Horizontal">
-                    <materialDesign:PackIcon Kind="Settings" Margin="0,0,5,0" Foreground="White"/>
-                    <TextBlock Text="Options"/>
-                </StackPanel>
-            </Button>
-            <!-- Nút Reset Cooldown -->
             <Button Grid.Row="3" Grid.Column="1" Margin="5" Style="{StaticResource MaterialDesignRaisedButton}" Background="#FF2196F3" BorderBrush="#FF2196F3" Foreground="White" Click="ResetCooldown_Click">
                 <StackPanel Orientation="Horizontal">
                     <materialDesign:PackIcon Kind="Refresh" Margin="0,0,5,0" Foreground="White"/>
@@ -109,7 +100,7 @@
             <!-- Cooldown Displays -->
             <TextBlock x:Name="LockPickCooldown" Grid.Row="4" Grid.Column="0" Margin="5" HorizontalAlignment="Center" VerticalAlignment="Center" Text="LockPick: Ready" Background="LightGreen" Foreground="Black"/>
             <TextBlock x:Name="AutoATMCooldown" Grid.Row="5" Grid.Column="0" Margin="5" HorizontalAlignment="Center" VerticalAlignment="Center" Text="AutoATM: Ready" Background="LightGreen" Foreground="Black"/>
-            <TextBlock x:Name="RobBankCooldown" Grid.Row="5" Grid.Column="1" Margin="5" HorizontalAlignment="Center" VerticalAlignment="Center" Text="RobBank: Ready" Background="LightGreen" Foreground="Black"/>
+            <!-- The RobBankCooldown TextBlock has been removed -->
             <TextBlock x:Name="GlassCuttingCooldown" Grid.Row="4" Grid.Column="1" Margin="5" HorizontalAlignment="Center" VerticalAlignment="Center" Text="GlassCutting: Ready" Background="LightGreen" Foreground="Black"/>
         </Grid>
         <!-- Log Area -->
